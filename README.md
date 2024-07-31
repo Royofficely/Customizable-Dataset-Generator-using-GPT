@@ -2,7 +2,6 @@
 
 This project provides a flexible framework for generating synthetic datasets using OpenAI's GPT model. It can be easily adapted to generate various types of text data based on user-defined topics and prompts, with a focus on creating realistic interactions between two roles (e.g., customer and support agent).
 
-![Dataset Generator Demo](https://officelyfiles.s3.eu-west-1.amazonaws.com/1ea09d52-27b5-450c-a3ad-906b55086d4e.gif)
 
 ## Table of Contents
 
