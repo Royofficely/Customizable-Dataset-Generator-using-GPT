@@ -21,12 +21,11 @@ def load_config(config_file):
         print(f"Error parsing {config_file}: {e}")
         sys.exit(1)
 
-def generate_text(prompt, model, client, subject):
+def generate_text_from_llm(prompt, model, client):
     try:
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": f"You are a helpful assistant generating {subject}"},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=500,
@@ -39,14 +38,41 @@ def generate_text(prompt, model, client, subject):
         if "Rate limit" in str(e):
             print("Rate limit exceeded. Waiting for 60 seconds before retrying...")
             time.sleep(60)
-            return generate_text(prompt, model, client, subject)
+            return generate_text_from_llm(prompt, model, client)
         elif "Authentication" in str(e):
             print("Authentication error. Please check your API key.")
             sys.exit(1)
         else:
             print(f"An unexpected error occurred: {e}")
             time.sleep(20)  # Wait for 20 seconds before retrying
-            return generate_text(prompt, model, client, subject)
+            return generate_text_from_llm(prompt, model, client)
+
+def load_text_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            return file.read()
+    except FileNotFoundError:
+        print(f"Error: {file_path} not found. Please ensure the file exists.")
+        sys.exit(1)
+
+def generate_text_from_file(prompt, text_content, client, model):
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": f"You are a helpful assistant. Use the following information to answer questions: {text_content}"},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=500,
+            n=1,
+            stop=None,
+            temperature=0.7,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"An error occurred while generating text from file: {e}")
+        time.sleep(20)
+        return generate_text_from_file(prompt, text_content, client, model)
 
 def main(config_file):
     config = load_config(config_file)
@@ -57,18 +83,30 @@ def main(config_file):
 
     client = OpenAI(api_key=api_key)
     
+    if config['use_text_file']:
+        text_content = load_text_file(config['text_file_path'])
+    
     data = []
     for _ in tqdm(range(config['num_interactions'])):
-        topic = random.choice(config['topics'])
-        prompt = config['prompt'].format(
-            subject=config['subject'],
-            topic=topic,
-            role1=config['role1'],
-            role2=config['role2']
-        )
-        generated_text = generate_text(prompt, config['model'], client, config['subject'])
+        if config['use_text_file']:
+            prompt = config['prompt_text_file'].format(
+                role1=config['role1'],
+                role2=config['role2'],
+                context=text_content
+            )
+            generated_text = generate_text_from_file(prompt, text_content, client, config['model'])
+        else:
+            topic = random.choice(config['topics'])
+            prompt = config['prompt_llm'].format(
+                subject=config['subject'],
+                topic=topic,
+                role1=config['role1'],
+                role2=config['role2']
+            )
+            generated_text = generate_text_from_llm(prompt, config['model'], client)
+        
         data.append({
-            "topic": topic,
+            "topic": topic if not config['use_text_file'] else "N/A",
             "generated_text": generated_text,
             "role1": config['role1'],
             "role2": config['role2']
