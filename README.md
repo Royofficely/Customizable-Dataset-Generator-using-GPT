@@ -2,21 +2,37 @@
 
 This project provides a flexible framework for generating synthetic datasets using OpenAI's GPT model. It can be easily adapted to generate various types of text data based on user-defined topics and prompts, with a focus on creating realistic interactions between two roles (e.g., customer and support agent).
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Manual Setup](#manual-setup)
+- [Usage](#usage)
+- [Customization](#customization)
+- [Output](#output)
+- [Error Handling](#error-handling)
+- [Advanced Features](#advanced-features)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
+- [Disclaimer](#disclaimer)
+
 ## Prerequisites
 
 - Python 3.6+
 - OpenAI API key
+- Git (for cloning the repository)
 
 ## Quick Start
 
 1. Clone this repository:
-   ```
-   git clone https://github.com/Royofficely/Customizable-Dataset-Generator-using-GPT.git
-   cd Customizable-Dataset-Generator-using-GPT
+   ```bash
+   git clone https://github.com/yourusername/customizable-dataset-generator.git
+   cd customizable-dataset-generator
    ```
 
 2. Run the setup script:
-   ```
+   ```bash
    chmod +x setup.sh
    ./setup.sh
    ```
@@ -27,20 +43,14 @@ This project provides a flexible framework for generating synthetic datasets usi
    - Prompt you for your OpenAI API key and save it securely
 
 3. Activate the virtual environment:
-   ```
+   ```bash
    source venv/bin/activate
    ```
    You should see `(venv)` at the beginning of your command prompt after activation.
 
-4. Verify the installation:
-   ```
-   pip list
-   ```
-   Ensure that all required packages, including `openai`, are listed.
-
-5. Run the script:
-   ```
-   python main-script.py config-file.yaml
+4. Run the script:
+   ```bash
+   ./venv/bin/python main-script.py config-file.yaml
    ```
 
 Note: If you close your terminal or start a new session, you'll need to activate the virtual environment again (step 3) before running the script.
@@ -50,13 +60,13 @@ Note: If you close your terminal or start a new session, you'll need to activate
 If you prefer to set up manually:
 
 1. Create and activate a virtual environment:
-   ```
+   ```bash
    python3 -m venv venv
    source venv/bin/activate
    ```
 
 2. Install the required packages:
-   ```
+   ```bash
    pip install -r requirements.txt
    ```
 
@@ -66,6 +76,17 @@ If you prefer to set up manually:
      ```
      OPENAI_API_KEY=your_openai_api_key_here
      ```
+
+## Usage
+
+To generate a dataset:
+
+1. Ensure your virtual environment is activated.
+2. Run the script with your configuration file:
+   ```bash
+   ./venv/bin/python main-script.py config-file.yaml
+   ```
+3. The script will generate the dataset based on your configuration and save it to the specified output file.
 
 ## Customization
 
@@ -133,14 +154,33 @@ The script includes error handling for:
 - Authentication errors
 - Unexpected errors (waits and retries)
 
-## License
+## Advanced Features
 
-This project is licensed under the MIT License.
+- **Custom Parsing**: Implement custom parsing logic in `parse_interaction()` function to extract specific fields from generated text.
+- **Batch Processing**: The script supports generating large datasets in batches to manage API usage and processing time.
+- **Extensibility**: The modular design allows for easy addition of new features or integration with other data processing pipelines.
 
-## Disclaimer
+## Troubleshooting
 
-This project is for educational and research purposes only. Ensure you comply with OpenAI's use-case policy and terms of service when using their API.
+- **API Key Issues**: Ensure your OpenAI API key is correctly set in the `.env` file.
+- **Rate Limiting**: If you encounter frequent rate limit errors, try increasing the `delay` value in your config file.
+- **Model Availability**: Make sure the specified model in your config file is available in your OpenAI plan.
+- **Script Execution**: If you're having trouble running the script, make sure you're using the correct path to the Python interpreter in your virtual environment: `./venv/bin/python main-script.py config-file.yaml`
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Disclaimer
+
+This project is for educational and research purposes only. Ensure you comply with OpenAI's use-case policy and terms of service when using their API. The generated data should not be used for any malicious purposes or to create misleading information.
