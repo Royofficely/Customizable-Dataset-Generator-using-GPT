@@ -1,6 +1,6 @@
 # Customizable Dataset Generator using GPT
 
-This project provides a flexible framework for generating synthetic datasets using OpenAI's GPT model or a custom text file. It can be easily adapted to generate various types of text data based on user-defined topics and prompts, with a focus on creating realistic interactions between two roles (e.g., customer and support agent).
+This project provides a flexible framework for generating synthetic datasets using OpenAI's GPT model or a custom text file. It can be easily adapted to generate various types of text data based on user-defined prompts, with a focus on creating realistic interactions between two roles (e.g., customer and support agent).
 
 ## Table of Contents
 
@@ -89,20 +89,23 @@ The script will generate the dataset based on your configuration and save it to 
 
 Edit the `config-file.yaml` to customize:
 
-- `subject`: The type of text being generated (e.g., "customer support interactions")
+- `use_text_file`: Boolean flag to use a text file instead of LLM
+- `text_file_path`: Path to the text file when `use_text_file` is true
+- `subject`: The type of text being generated (used when `use_text_file` is false)
 - `model`: The GPT model to use (e.g., "gpt-3.5-turbo")
 - `num_interactions`: Number of data points to generate
 - `delay`: Delay between API calls (in seconds)
 - `output_file`: Name of the output CSV file
 - `role1` and `role2`: The two roles in the interaction (e.g., "Customer" and "Agent")
-- `prompt`: The prompt template for generating text
-- `topics`: List of topics or categories for generation
-- `use_text_file`: Boolean flag to use a text file instead of LLM (new feature)
-- `text_file_path`: Path to the text file when `use_text_file` is true (new feature)
+- `prompt_llm`: The prompt template for generating text using the LLM
+- `prompt_text_file`: The prompt template for generating text using a text file
+- `topics`: List of topics or categories for generation (used when `use_text_file` is false)
 
 Example `config-file.yaml`:
 
 ```yaml
+use_text_file: false
+text_file_path: "knowledge_base.txt"
 subject: "customer support interactions"
 model: "gpt-3.5-turbo"
 num_interactions: 20
@@ -110,9 +113,7 @@ delay: 1
 output_file: "synthetic_dataset.csv"
 role1: "Customer"
 role2: "Agent"
-use_text_file: false
-text_file_path: "knowledge_base.txt"
-prompt: "Generate a detailed and realistic {subject} interaction between a {role1} and a {role2}. The interaction should include:
+prompt_llm: "Generate a detailed and realistic {subject} interaction between a {role1} and a {role2}. The interaction should include:
 
 1. A specific inquiry or problem from the {role1} related to {topic}
 2. A detailed and helpful response from the {role2}
@@ -126,6 +127,23 @@ Format the interaction as:
 {role2}: [follow-up response if applicable]'
 
 Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario."
+
+prompt_text_file: "Generate a detailed and realistic interaction between a {role1} and a {role2} based on the following information: {context}
+
+The interaction should include:
+1. A specific inquiry or problem from the {role1} related to the provided information
+2. A detailed and helpful response from the {role2}, using only the information provided
+3. Any relevant technical details, error messages, or specific examples mentioned in the provided information
+4. A natural flow of conversation, including any necessary follow-up questions or clarifications
+
+Format the interaction as:
+'{role1}: [{role1}'s detailed message]
+{role2}: [{role2}'s comprehensive response]
+{role1}: [any follow-up question if applicable]
+{role2}: [follow-up response if applicable]'
+
+Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario. 
+IMPORTANT: Respond in the same language as the provided information. Do not use any knowledge outside of the given context."
 
 topics:
   - "Product information"
@@ -143,7 +161,7 @@ topics:
 
 ## Text File Source Feature
 
-The new text file source feature allows you to use a custom text file as the knowledge base for generating responses, instead of relying solely on the LLM's knowledge. This is useful when you want to generate responses based on specific information or documentation.
+The text file source feature allows you to use a custom text file as the knowledge base for generating responses, instead of relying on the LLM's general knowledge. This is useful when you want to generate responses based on specific information or documentation.
 
 To use this feature:
 
@@ -153,10 +171,15 @@ To use this feature:
 
 When this feature is enabled, the script will:
 1. Load the content of the specified text file.
-2. Use GPT-3.5-turbo to generate responses based on the content of the text file, rather than its general knowledge.
-3. Still use the LLM to structure the response according to your prompt, but the information will be sourced from your text file.
+2. Use GPT-3.5-turbo to generate responses based solely on the content of the text file, rather than its general knowledge.
+3. Structure the response according to your `prompt_text_file`, using only the information from your text file.
 
-This allows you to create more focused and domain-specific datasets while still leveraging the language capabilities of the GPT model.
+Important notes when using a text file:
+- The `subject` and `topics` fields in the config file are not used when `use_text_file` is true.
+- Ensure your prompt instructs the model to use only the provided information and not any external knowledge.
+- The prompt should instruct the model to respond in the same language as the provided information to maintain consistency.
+
+To use the LLM model without a text file, set `use_text_file: false` in the config file. In this case, the script will use the `prompt_llm`, `subject`, and `topics` fields to generate diverse interactions.
 
 ## Output
 
