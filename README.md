@@ -11,8 +11,8 @@ This project provides a flexible framework for generating synthetic datasets usi
 
 1. Clone this repository:
    ```
-   git clone https://github.com/yourusername/customizable-dataset-generator.git
-   cd customizable-dataset-generator
+   git clone https://github.com/Royofficely/Customizable-Dataset-Generator-using-GPT.git
+   cd Customizable-Dataset-Generator-using-GPT
    ```
 
 2. Run the setup script:
