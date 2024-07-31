@@ -19,17 +19,30 @@ else
     exit 1
 fi
 
-# Create virtual environment
+# Remove the old venv directory if it exists
+echo "Removing old virtual environment..."
+rm -rf venv
+
+# Create a new virtual environment
+echo "Creating new virtual environment..."
 $PYTHON_CMD -m venv venv
 
 # Activate virtual environment
 source venv/bin/activate
 
 # Upgrade pip
+echo "Upgrading pip..."
 pip install --upgrade pip
 
 # Install requirements
+echo "Installing requirements..."
 pip install -r requirements.txt
+
+# Verify installation of openai package
+if ! python -c "import openai" 2>/dev/null; then
+    echo "Error: openai package not installed correctly. Attempting to install directly..."
+    pip install openai
+fi
 
 # Prompt user for OpenAI API key
 echo "Please enter your OpenAI API key:"
@@ -66,3 +79,7 @@ echo "Setup complete. The sanitized API key has been exported for the current se
 echo "To make it available in new terminal sessions, please run:"
 echo "source ~/.bashrc (for Bash) or source ~/.zshrc (for Zsh)"
 echo "You can now run the script with: python main-script.py config-file.yaml"
+
+# Remind user to activate the virtual environment
+echo "Remember to activate the virtual environment before running the script:"
+echo "source venv/bin/activate"
