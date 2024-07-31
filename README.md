@@ -33,7 +33,7 @@ This project provides a flexible framework for generating synthetic datasets usi
 
 2. Run the setup script:
    ```chmod +x setup.sh
-./setup.sh
+   ./setup.sh
    ```
    This script will:
    - Check for Python 3.6+
