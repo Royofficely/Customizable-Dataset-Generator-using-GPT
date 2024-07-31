@@ -41,16 +41,10 @@ This project provides a flexible framework for generating synthetic datasets usi
    - Create a virtual environment
    - Install dependencies
    - Prompt you for your OpenAI API key and save it securely
+   - Activate the virtual environment
+   - Run the main script automatically
 
-3. Activate the virtual environment:
-   ```bash
-   source venv/bin/activate
-   ```
-
-4. Run the script:
-   ```bash
-   ./venv/bin/python main-script.py config-file.yaml
-   ```
+After running the setup script, you're all set! The script will have generated your dataset based on the default configuration.
 
 ## Manual Setup
 
@@ -76,14 +70,19 @@ If you prefer to set up manually:
 
 ## Usage
 
-To generate a dataset:
+If you've used the Quick Start method, the script will have run automatically after setup. For subsequent runs or if you've done a manual setup:
 
-1. Ensure your virtual environment is activated.
+1. Ensure your virtual environment is activated:
+   ```bash
+   source venv/bin/activate
+   ```
+
 2. Run the script with your configuration file:
    ```bash
    ./venv/bin/python main-script.py config-file.yaml
    ```
-3. The script will generate the dataset based on your configuration and save it to the specified output files.
+
+The script will generate the dataset based on your configuration and save it to the specified output files.
 
 ## Customization
 
