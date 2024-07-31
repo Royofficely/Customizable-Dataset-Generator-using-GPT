@@ -28,11 +28,12 @@ This project provides a flexible framework for generating synthetic datasets usi
 1. Clone this repository:
    ```bash
    git clone https://github.com/Royofficely/Customizable-Dataset-Generator-using-GPT.git
-   cd customizable-dataset-generator
+   cd Customizable-Dataset-Generator-using-GPT
    ```
 
 2. Run the setup script:
-   ```chmod +x setup.sh
+   ```bash
+   chmod +x setup.sh
    ./setup.sh
    ```
    This script will:
@@ -45,14 +46,11 @@ This project provides a flexible framework for generating synthetic datasets usi
    ```bash
    source venv/bin/activate
    ```
-   You should see `(venv)` at the beginning of your command prompt after activation.
 
 4. Run the script:
    ```bash
    ./venv/bin/python main-script.py config-file.yaml
    ```
-
-Note: If you close your terminal or start a new session, you'll need to activate the virtual environment again (step 3) before running the script.
 
 ## Manual Setup
 
@@ -85,7 +83,7 @@ To generate a dataset:
    ```bash
    ./venv/bin/python main-script.py config-file.yaml
    ```
-3. The script will generate the dataset based on your configuration and save it to the specified output file.
+3. The script will generate the dataset based on your configuration and save it to the specified output files.
 
 ## Customization
 
@@ -100,7 +98,7 @@ Edit the `config-file.yaml` to customize:
 - `prompt`: The prompt template for generating text
 - `topics`: List of topics or categories for generation
 
-Example `config-file.yaml` for generating customer support interactions:
+Example `config-file.yaml`:
 
 ```yaml
 subject: "customer support interactions"
@@ -164,7 +162,8 @@ The script includes error handling for:
 - **API Key Issues**: Ensure your OpenAI API key is correctly set in the `.env` file.
 - **Rate Limiting**: If you encounter frequent rate limit errors, try increasing the `delay` value in your config file.
 - **Model Availability**: Make sure the specified model in your config file is available in your OpenAI plan.
-- **Script Execution**: If you're having trouble running the script, make sure you're using the correct path to the Python interpreter in your virtual environment: `./venv/bin/python main-script.py config-file.yaml`
+- **Script Execution**: If you're having trouble running the script, ensure you're in the correct directory and using the correct path to the Python interpreter in your virtual environment: `./venv/bin/python main-script.py config-file.yaml`
+- **Virtual Environment**: If you see an error about missing modules, make sure you've activated the virtual environment with `source venv/bin/activate` before running the script.
 
 ## Contributing
 
