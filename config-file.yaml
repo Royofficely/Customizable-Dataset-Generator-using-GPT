@@ -1,11 +1,13 @@
+use_text_file: false
+text_file_path: "knowledge_base.txt"
 subject: "customer support interactions"
-model: "gpt-3.5-turbo"
-num_interactions: 10
+model: "gpt-4o-mini"
+num_interactions: 20
 delay: 1
 output_file: "synthetic_dataset.csv"
 role1: "Customer"
 role2: "Agent"
-prompt: "Generate a detailed and realistic {subject} interaction between a {role1} and a {role2}. The interaction should include:
+prompt_llm: "Generate a detailed and realistic {subject} interaction between a {role1} and a {role2}. The interaction should include:
 
 1. A specific inquiry or problem from the {role1} related to {topic}
 2. A detailed and helpful response from the {role2}
@@ -19,6 +21,23 @@ Format the interaction as:
 {role2}: [follow-up response if applicable]'
 
 Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario."
+
+prompt_text_file: "Generate a detailed and realistic interaction between a {role1} and a {role2} based on the following information: {context}
+
+The interaction should include:
+1. A specific inquiry or problem from the {role1} related to the provided information
+2. A detailed and helpful response from the {role2}, using only the information provided
+3. Any relevant technical details, error messages, or specific examples mentioned in the provided information
+4. A natural flow of conversation, including any necessary follow-up questions or clarifications
+
+Format the interaction as:
+'{role1}: [{role1}'s detailed message]
+{role2}: [{role2}'s comprehensive response]
+{role1}: [any follow-up question if applicable]
+{role2}: [follow-up response if applicable]'
+
+Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario. 
+IMPORTANT: Respond in the same language as the provided information. Do not use any knowledge outside of the given context."
 
 topics:
   - "Product information"
