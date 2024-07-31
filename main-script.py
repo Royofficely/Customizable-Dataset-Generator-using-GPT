@@ -1,5 +1,5 @@
+#!/usr/bin/env python
 import random
-import openai
 import pandas as pd
 import time
 from tqdm import tqdm
@@ -7,6 +7,7 @@ import yaml
 import os
 import sys
 import argparse
+from openai import OpenAI
 from convert_to_jsonl import convert_to_jsonl
 
 def load_config(config_file):
@@ -20,10 +21,9 @@ def load_config(config_file):
         print(f"Error parsing {config_file}: {e}")
         sys.exit(1)
 
-def generate_text(prompt, model, api_key, subject):
-    openai.api_key = api_key
+def generate_text(prompt, model, client, subject):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": f"You are a helpful assistant generating {subject}"},
@@ -34,18 +34,19 @@ def generate_text(prompt, model, api_key, subject):
             stop=None,
             temperature=0.7,
         )
-        return response.choices[0].message['content'].strip()
-    except openai.error.RateLimitError:
-        print("Rate limit exceeded. Waiting for 60 seconds before retrying...")
-        time.sleep(60)
-        return generate_text(prompt, model, api_key, subject)
-    except openai.error.AuthenticationError:
-        print("Authentication error. Please check your API key.")
-        sys.exit(1)
+        return response.choices[0].message.content.strip()
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-        time.sleep(20)  # Wait for 20 seconds before retrying
-        return generate_text(prompt, model, api_key, subject)
+        if "Rate limit" in str(e):
+            print("Rate limit exceeded. Waiting for 60 seconds before retrying...")
+            time.sleep(60)
+            return generate_text(prompt, model, client, subject)
+        elif "Authentication" in str(e):
+            print("Authentication error. Please check your API key.")
+            sys.exit(1)
+        else:
+            print(f"An unexpected error occurred: {e}")
+            time.sleep(20)  # Wait for 20 seconds before retrying
+            return generate_text(prompt, model, client, subject)
 
 def main(config_file):
     config = load_config(config_file)
@@ -53,31 +54,31 @@ def main(config_file):
     if not api_key:
         print("Error: API key not found. Please set the OPENAI_API_KEY environment variable.")
         sys.exit(1)
+
+    client = OpenAI(api_key=api_key)
     
     data = []
     for _ in tqdm(range(config['num_interactions'])):
         topic = random.choice(config['topics'])
         prompt = config['prompt'].format(
-            subject=config['subject'], 
-            topic=topic, 
-            role1=config['role1'], 
+            subject=config['subject'],
+            topic=topic,
+            role1=config['role1'],
             role2=config['role2']
         )
-        generated_text = generate_text(prompt, config['model'], api_key, config['subject'])
+        generated_text = generate_text(prompt, config['model'], client, config['subject'])
         data.append({
-            "topic": topic, 
-            "generated_text": generated_text, 
-            "role1": config['role1'], 
+            "topic": topic,
+            "generated_text": generated_text,
+            "role1": config['role1'],
             "role2": config['role2']
         })
         time.sleep(config['delay'])  # To avoid hitting API rate limits
 
     df = pd.DataFrame(data)
-
     try:
         df.to_csv(config['output_file'], index=False)
         print(f"Dataset saved to {config['output_file']}")
-
         # Convert to JSONL
         jsonl_output = config['output_file'].replace('.csv', '.jsonl')
         convert_to_jsonl(config['output_file'], jsonl_output, config['role1'], config['role2'])
