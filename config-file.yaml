@@ -1,6 +1,6 @@
 subject: "customer support interactions"
 model: "gpt-3.5-turbo"
-num_interactions: 20
+num_interactions: 10
 delay: 1
 output_file: "synthetic_dataset.csv"
 role1: "Customer"
