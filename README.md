@@ -1,7 +1,6 @@
 # Customizable Dataset Generator using GPT
 
-This project provides a flexible framework for generating synthetic datasets using OpenAI's GPT model. It can be easily adapted to generate various types of text data based on user-defined topics and prompts, with a focus on creating realistic interactions between two roles (e.g., customer and support agent).
-
+This project provides a flexible framework for generating synthetic datasets using OpenAI's GPT model or a custom text file. It can be easily adapted to generate various types of text data based on user-defined topics and prompts, with a focus on creating realistic interactions between two roles (e.g., customer and support agent).
 
 ## Table of Contents
 
@@ -10,6 +9,7 @@ This project provides a flexible framework for generating synthetic datasets usi
 - [Manual Setup](#manual-setup)
 - [Usage](#usage)
 - [Customization](#customization)
+- [Text File Source Feature](#text-file-source-feature)
 - [Output](#output)
 - [Error Handling](#error-handling)
 - [Advanced Features](#advanced-features)
@@ -97,6 +97,8 @@ Edit the `config-file.yaml` to customize:
 - `role1` and `role2`: The two roles in the interaction (e.g., "Customer" and "Agent")
 - `prompt`: The prompt template for generating text
 - `topics`: List of topics or categories for generation
+- `use_text_file`: Boolean flag to use a text file instead of LLM (new feature)
+- `text_file_path`: Path to the text file when `use_text_file` is true (new feature)
 
 Example `config-file.yaml`:
 
@@ -108,6 +110,8 @@ delay: 1
 output_file: "synthetic_dataset.csv"
 role1: "Customer"
 role2: "Agent"
+use_text_file: false
+text_file_path: "knowledge_base.txt"
 prompt: "Generate a detailed and realistic {subject} interaction between a {role1} and a {role2}. The interaction should include:
 
 1. A specific inquiry or problem from the {role1} related to {topic}
@@ -137,6 +141,23 @@ topics:
   - "API"
 ```
 
+## Text File Source Feature
+
+The new text file source feature allows you to use a custom text file as the knowledge base for generating responses, instead of relying solely on the LLM's knowledge. This is useful when you want to generate responses based on specific information or documentation.
+
+To use this feature:
+
+1. Set `use_text_file: true` in your `config-file.yaml`.
+2. Specify the path to your text file in `text_file_path` in the config file.
+3. Ensure your text file contains the relevant information you want to use for generating responses.
+
+When this feature is enabled, the script will:
+1. Load the content of the specified text file.
+2. Use GPT-3.5-turbo to generate responses based on the content of the text file, rather than its general knowledge.
+3. Still use the LLM to structure the response according to your prompt, but the information will be sourced from your text file.
+
+This allows you to create more focused and domain-specific datasets while still leveraging the language capabilities of the GPT model.
+
 ## Output
 
 The script generates two output files:
@@ -156,6 +177,7 @@ The script includes error handling for:
 - **Custom Parsing**: Implement custom parsing logic in `parse_interaction()` function to extract specific fields from generated text.
 - **Batch Processing**: The script supports generating large datasets in batches to manage API usage and processing time.
 - **Extensibility**: The modular design allows for easy addition of new features or integration with other data processing pipelines.
+- **Text File Source**: Use a custom text file as the knowledge base for generating responses, allowing for more focused and domain-specific datasets.
 
 ## Troubleshooting
 
@@ -164,6 +186,7 @@ The script includes error handling for:
 - **Model Availability**: Make sure the specified model in your config file is available in your OpenAI plan.
 - **Script Execution**: If you're having trouble running the script, ensure you're in the correct directory and using the correct path to the Python interpreter in your virtual environment: `./venv/bin/python main-script.py config-file.yaml`
 - **Virtual Environment**: If you see an error about missing modules, make sure you've activated the virtual environment with `source venv/bin/activate` before running the script.
+- **Text File Issues**: If using the text file feature, ensure the file exists at the specified path and contains the expected content.
 
 ## Contributing
 
