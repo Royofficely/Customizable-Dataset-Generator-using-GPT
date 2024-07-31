@@ -92,7 +92,7 @@ Edit the `config-file.yaml` to customize:
 - `use_text_file`: Boolean flag to use a text file instead of LLM
 - `text_file_path`: Path to the text file when `use_text_file` is true
 - `subject`: The type of text being generated (used when `use_text_file` is false)
-- `model`: The GPT model to use (e.g., "gpt-3.5-turbo")
+- `model`: The GPT model to use (e.g., "gpt-4o-mini")
 - `num_interactions`: Number of data points to generate
 - `delay`: Delay between API calls (in seconds)
 - `output_file`: Name of the output CSV file
@@ -107,7 +107,7 @@ Example `config-file.yaml`:
 use_text_file: false
 text_file_path: "knowledge_base.txt"
 subject: "customer support interactions"
-model: "gpt-3.5-turbo"
+model: "gpt-4o-mini"
 num_interactions: 20
 delay: 1
 output_file: "synthetic_dataset.csv"
@@ -171,7 +171,7 @@ To use this feature:
 
 When this feature is enabled, the script will:
 1. Load the content of the specified text file.
-2. Use GPT-3.5-turbo to generate responses based solely on the content of the text file, rather than its general knowledge.
+2. Use gpt-4o-mini to generate responses based solely on the content of the text file, rather than its general knowledge.
 3. Structure the response according to your `prompt_text_file`, using only the information from your text file.
 
 Important notes when using a text file:
