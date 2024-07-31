@@ -1,0 +1,34 @@
+subject: "customer support interactions"
+model: "gpt-3.5-turbo"
+num_interactions: 20
+delay: 1
+output_file: "synthetic_dataset.csv"
+role1: "Customer"
+role2: "Agent"
+prompt: "Generate a detailed and realistic {subject} interaction between a {role1} and a {role2}. The interaction should include:
+
+1. A specific inquiry or problem from the {role1} related to {topic}
+2. A detailed and helpful response from the {role2}
+3. Any relevant technical details, error messages, or specific examples that would typically be part of such an interaction
+4. A natural flow of conversation, including any necessary follow-up questions or clarifications
+
+Format the interaction as:
+'{role1}: [{role1}'s detailed message]
+{role2}: [{role2}'s comprehensive response]
+{role1}: [any follow-up question if applicable]
+{role2}: [follow-up response if applicable]'
+
+Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario."
+
+topics:
+  - "Product information"
+  - "Order status"
+  - "Returns and refunds"
+  - "Technical support"
+  - "Account issues"
+  - "Shipping and delivery"
+  - "Billing inquiries"
+  - "Warranty claims"
+  - "Product comparisons"
+  - "Complaints"
+  - "API"
