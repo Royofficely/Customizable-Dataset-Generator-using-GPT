@@ -46,7 +46,7 @@ fi
 
 # Prompt user for OpenAI API key
 echo "Please enter your OpenAI API key:"
-read -s api_key_input  # -s flag hides the input
+read -s api_key_input # -s flag hides the input
 
 # Sanitize the API key: remove spaces and special characters
 api_key=$(echo "$api_key_input" | tr -dc '[:alnum:]-_')
@@ -78,8 +78,9 @@ fi
 echo "Setup complete. The sanitized API key has been exported for the current session."
 echo "To make it available in new terminal sessions, please run:"
 echo "source ~/.bashrc (for Bash) or source ~/.zshrc (for Zsh)"
-echo "You can now run the script with: python main-script.py config-file.yaml"
 
-# Remind user to activate the virtual environment
-echo "Remember to activate the virtual environment before running the script:"
-echo "source venv/bin/activate"
+# Automatically run the main script
+echo "Running the main script..."
+./venv/bin/python main-script.py config-file.yaml
+
+echo "Script execution complete."
