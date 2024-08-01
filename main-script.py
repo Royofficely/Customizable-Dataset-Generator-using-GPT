@@ -147,7 +147,10 @@ async def main(config_file):
             print(f"Generating text for interaction {i+1}...")
             generated_text = await generate_text_from_file(prompt, text_content, client, config['model'], config['role1'], config['role2'], config['use_chunking'])
         else:
-            topic = random.choice(config['topics'])
+            if 'topics' in config and config['topics']:
+                topic = random.choice(config['topics'])
+            else:
+                topic = "general inquiry"  # Default topic if not provided
             prompt = config['prompt_llm'].format(
                 subject=config['subject'],
                 topic=topic,
