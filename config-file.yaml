@@ -1,28 +1,33 @@
 use_text_file: false
 text_file_path: "knowledge_base.txt"
+use_chunking: true
 subject: "customer support interactions"
-model: "gpt-4o-mini"
-num_interactions: 20
+model: "gpt-3.5-turbo"
+num_interactions: 10
 delay: 1
 output_file: "synthetic_dataset.csv"
 role1: "Customer"
 role2: "Agent"
+topics:
+  - "product returns"
+  - "billing issues"
+  - "technical support"
+  - "account management"
+  - "shipping inquiries"
 prompt_llm: "Generate a detailed and realistic {subject} interaction between a {role1} and a {role2}. The interaction should include:
-
 1. A specific inquiry or problem from the {role1} related to {topic}
 2. A detailed and helpful response from the {role2}
 3. Any relevant technical details, error messages, or specific examples that would typically be part of such an interaction
 4. A natural flow of conversation, including any necessary follow-up questions or clarifications
-
 Format the interaction as:
 '{role1}: [{role1}'s detailed message]
 {role2}: [{role2}'s comprehensive response]
 {role1}: [any follow-up question if applicable]
 {role2}: [follow-up response if applicable]'
-
 Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario."
+prompt_text_file: "IMPORTANT: Respond ONLY in the same language as the provided information. Do not translate or use any other language.
 
-prompt_text_file: "Generate a detailed and realistic interaction between a {role1} and a {role2} based on the following information: {context}
+Generate a detailed and realistic interaction between a {role1} and a {role2} based on the following information: {context}
 
 The interaction should include:
 1. A specific inquiry or problem from the {role1} related to the provided information
@@ -36,18 +41,10 @@ Format the interaction as:
 {role1}: [any follow-up question if applicable]
 {role2}: [follow-up response if applicable]'
 
-Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario. 
-IMPORTANT: Respond in the same language as the provided information. Do not use any knowledge outside of the given context."
+Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario.
 
-topics:
-  - "Product information"
-  - "Order status"
-  - "Returns and refunds"
-  - "Technical support"
-  - "Account issues"
-  - "Shipping and delivery"
-  - "Billing inquiries"
-  - "Warranty claims"
-  - "Product comparisons"
-  - "Complaints"
-  - "API"
+FINAL REMINDER: Your entire response must be in the same language as the provided information. Do not use any knowledge outside of the given context."
+prompt_generate_topic: "Based on the following conversation, generate a short, concise topic (1-5 words) that best describes the main subject of the interaction. Respond ONLY with the topic, nothing else. Use the same language as the conversation.
+
+Conversation:
+{conversation}"
