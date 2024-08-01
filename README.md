@@ -91,6 +91,7 @@ Edit the `config-file.yaml` to customize:
 - `use_text_file`: Set to true if you want to use a text file as input, false otherwise
 - `text_file_path`: Path to the input text file (if `use_text_file` is true)
 - `use_chunking`: Set to true to enable text chunking for large input files
+- `language`: Set the language of result.
 - `subject`: The type of text being generated (e.g., "customer support interactions")
 - `model`: The GPT model to use (e.g., "gpt-3.5-turbo")
 - `num_interactions`: Number of data points to generate
@@ -114,6 +115,7 @@ delay: 1
 output_file: "synthetic_dataset.csv"
 role1: "Customer"
 role2: "Agent"
+language: "English"
 topics:
   - "product returns"
   - "billing issues"
