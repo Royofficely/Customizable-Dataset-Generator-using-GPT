@@ -80,14 +80,14 @@ async def summarize_text(text, client, model):
     summarize_prompt = f"Please summarize the following text in a concise manner, focusing on the most important information:\n\n{text}\n\nSummary:"
     return await generate_text_from_llm(summarize_prompt, model, client)
 
-async def generate_text_from_file(prompt, text_content, client, model, role1, role2, use_chunking=True):
+async def generate_text_from_file(prompt, text_content, client, model, role1, role2, language, use_chunking=True):
     if not use_chunking:
         try:
             response = await client.chat.completions.create(
                 model=model,
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant. Use the provided information to answer questions."},
-                    {"role": "user", "content": prompt.format(role1=role1, role2=role2, context=text_content)}
+                    {"role": "system", "content": f"You are a helpful assistant. Use the provided information to answer questions. Respond ONLY in {language}."},
+                    {"role": "user", "content": prompt.format(role1=role1, role2=role2, context=text_content, language=language)}
                 ],
                 max_tokens=500,
                 n=1,
@@ -98,7 +98,7 @@ async def generate_text_from_file(prompt, text_content, client, model, role1, ro
         except Exception as e:
             print(f"An error occurred while generating text from file: {e}")
             await asyncio.sleep(20)
-            return await generate_text_from_file(prompt, text_content, client, model, role1, role2, use_chunking)
+            return await generate_text_from_file(prompt, text_content, client, model, role1, role2, language, use_chunking)
 
     chunks = split_text_into_chunks(text_content)
     summaries = await asyncio.gather(*[summarize_text(chunk, client, model) for chunk in chunks])
@@ -108,8 +108,8 @@ async def generate_text_from_file(prompt, text_content, client, model, role1, ro
         response = await client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": "You are a helpful assistant. Use the provided information to answer questions."},
-                {"role": "user", "content": prompt.format(role1=role1, role2=role2, context=combined_summary)}
+                {"role": "system", "content": f"You are a helpful assistant. Use the provided information to answer questions. Respond ONLY in {language}."},
+                {"role": "user", "content": prompt.format(role1=role1, role2=role2, context=combined_summary, language=language)}
             ],
             max_tokens=500,
             n=1,
@@ -120,10 +120,10 @@ async def generate_text_from_file(prompt, text_content, client, model, role1, ro
     except Exception as e:
         print(f"An error occurred while generating text from file: {e}")
         await asyncio.sleep(20)
-        return await generate_text_from_file(prompt, text_content, client, model, role1, role2, use_chunking)
+        return await generate_text_from_file(prompt, text_content, client, model, role1, role2, language, use_chunking)
 
-async def generate_topic(conversation, model, client):
-    topic_prompt = f"Based on the following conversation, generate a short, concise topic (1-5 words) that best describes the main subject of the interaction. Respond ONLY with the topic, nothing else. Use the same language as the conversation:\n\n{conversation}"
+async def generate_topic(conversation, model, client, language):
+    topic_prompt = f"Based on the following conversation, generate a short, concise topic (1-5 words) that best describes the main subject of the interaction. Respond ONLY with the topic, nothing else. The topic must be in {language}:\n\n{conversation}"
     return await generate_text_from_llm(topic_prompt, model, client)
 
 async def main(config_file):
@@ -145,7 +145,7 @@ async def main(config_file):
         if config['use_text_file']:
             prompt = config['prompt_text_file']
             print(f"Generating text for interaction {i+1}...")
-            generated_text = await generate_text_from_file(prompt, text_content, client, config['model'], config['role1'], config['role2'], config['use_chunking'])
+            generated_text = await generate_text_from_file(prompt, text_content, client, config['model'], config['role1'], config['role2'], config['language'], config['use_chunking'])
         else:
             if 'topics' in config and config['topics']:
                 topic = random.choice(config['topics'])
@@ -155,12 +155,13 @@ async def main(config_file):
                 subject=config['subject'],
                 topic=topic,
                 role1=config['role1'],
-                role2=config['role2']
+                role2=config['role2'],
+                language=config['language']
             )
             generated_text = await generate_text_from_llm(prompt, config['model'], client)
         
         # Generate topic for the conversation
-        topic = await generate_topic(generated_text, config['model'], client)
+        topic = await generate_topic(generated_text, config['model'], client, config['language'])
         
         return generated_text, topic
 
