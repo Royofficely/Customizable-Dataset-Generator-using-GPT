@@ -1,4 +1,4 @@
-use_text_file: true
+use_text_file: false
 text_file_path: "knowledge_base.txt"
 use_chunking: true
 subject: "customer support interactions"
