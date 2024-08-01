@@ -1,9 +1,10 @@
 #!/bin/bash
+set -e # Exit immediately if a command exits with a non-zero status
 
 # Function to check Python version
 check_python_version() {
-    if command -v $1 >/dev/null 2>&1; then
-        if $1 -c "import sys; exit(0) if sys.version_info >= (3,6) else exit(1)" >/dev/null 2>&1; then
+    if command -v "$1" >/dev/null 2>&1; then
+        if "$1" -c "import sys; exit(0 if sys.version_info >= (3,6) else 1)" >/dev/null 2>&1; then
             echo "$1"
             return 0
         fi
@@ -25,7 +26,7 @@ rm -rf venv
 
 # Create a new virtual environment
 echo "Creating new virtual environment..."
-$PYTHON_CMD -m venv venv
+"$PYTHON_CMD" -m venv venv
 
 # Activate virtual environment
 source venv/bin/activate
@@ -46,7 +47,7 @@ fi
 
 # Prompt user for OpenAI API key
 echo "Please enter your OpenAI API key:"
-read -s api_key_input # -s flag hides the input
+read -rs api_key_input # -s flag hides the input
 
 # Sanitize the API key: remove spaces and special characters
 api_key=$(echo "$api_key_input" | tr -dc '[:alnum:]-_')
@@ -79,8 +80,14 @@ echo "Setup complete. The sanitized API key has been exported for the current se
 echo "To make it available in new terminal sessions, please run:"
 echo "source ~/.bashrc (for Bash) or source ~/.zshrc (for Zsh)"
 
-# Automatically run the main script
-echo "Running the main script..."
-./venv/bin/python main-script.py config-file.yaml
+# Check if both config files exist
+if [ ! -f "config.yaml" ] || [ ! -f "prompts.yaml" ]; then
+    echo "Warning: config.yaml or prompts.yaml not found in the current directory."
+    echo "Please ensure both files exist before running the main script."
+fi
 
-echo "Script execution complete."
+echo ""
+echo "To run the main script, use the following command:"
+echo "./venv/bin/python main.py config.yaml prompts.yaml"
+echo ""
+echo "Make sure both config.yaml and prompts.yaml are in the same directory as main.py before running the command."
