@@ -1,6 +1,6 @@
 # Customizable Dataset Generator using GPT
 
-This project provides a flexible framework for generating synthetic datasets using OpenAI's GPT model or a custom text file. It can be easily adapted to generate various types of text data based on user-defined prompts, with a focus on creating realistic interactions between two roles (e.g., customer and support agent).
+This project provides a flexible framework for generating synthetic datasets using OpenAI's GPT model. It can be easily adapted to generate various types of text data based on user-defined topics and prompts, with a focus on creating realistic interactions between two roles (e.g., customer and support agent).
 
 ## Table of Contents
 
@@ -9,7 +9,6 @@ This project provides a flexible framework for generating synthetic datasets usi
 - [Manual Setup](#manual-setup)
 - [Usage](#usage)
 - [Customization](#customization)
-- [Text File Source Feature](#text-file-source-feature)
 - [Output](#output)
 - [Error Handling](#error-handling)
 - [Advanced Features](#advanced-features)
@@ -89,46 +88,52 @@ The script will generate the dataset based on your configuration and save it to 
 
 Edit the `config-file.yaml` to customize:
 
-- `use_text_file`: Boolean flag to use a text file instead of LLM
-- `text_file_path`: Path to the text file when `use_text_file` is true
-- `subject`: The type of text being generated (used when `use_text_file` is false)
-- `model`: The GPT model to use (e.g., "gpt-4o-mini")
+- `use_text_file`: Set to true if you want to use a text file as input, false otherwise
+- `text_file_path`: Path to the input text file (if `use_text_file` is true)
+- `use_chunking`: Set to true to enable text chunking for large input files
+- `subject`: The type of text being generated (e.g., "customer support interactions")
+- `model`: The GPT model to use (e.g., "gpt-3.5-turbo")
 - `num_interactions`: Number of data points to generate
 - `delay`: Delay between API calls (in seconds)
 - `output_file`: Name of the output CSV file
 - `role1` and `role2`: The two roles in the interaction (e.g., "Customer" and "Agent")
-- `prompt_llm`: The prompt template for generating text using the LLM
-- `prompt_text_file`: The prompt template for generating text using a text file
-- `topics`: List of topics or categories for generation (used when `use_text_file` is false)
+- `prompt_llm`: The prompt template for generating text when not using a text file
+- `prompt_text_file`: The prompt template for generating text when using a text file
+- `topics`: List of topics or categories for generation (optional)
 
 Example `config-file.yaml`:
 
 ```yaml
 use_text_file: false
 text_file_path: "knowledge_base.txt"
+use_chunking: false
 subject: "customer support interactions"
-model: "gpt-4o-mini"
-num_interactions: 20
+model: "gpt-3.5-turbo"
+num_interactions: 5
 delay: 1
 output_file: "synthetic_dataset.csv"
 role1: "Customer"
 role2: "Agent"
+topics:
+  - "product returns"
+  - "billing issues"
+  - "technical support"
+  - "account management"
+  - "shipping inquiries"
 prompt_llm: "Generate a detailed and realistic {subject} interaction between a {role1} and a {role2}. The interaction should include:
-
 1. A specific inquiry or problem from the {role1} related to {topic}
 2. A detailed and helpful response from the {role2}
 3. Any relevant technical details, error messages, or specific examples that would typically be part of such an interaction
 4. A natural flow of conversation, including any necessary follow-up questions or clarifications
-
 Format the interaction as:
 '{role1}: [{role1}'s detailed message]
 {role2}: [{role2}'s comprehensive response]
 {role1}: [any follow-up question if applicable]
 {role2}: [follow-up response if applicable]'
-
 Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario."
+prompt_text_file: "IMPORTANT: Respond ONLY in the same language as the provided information. Do not translate or use any other language.
 
-prompt_text_file: "Generate a detailed and realistic interaction between a {role1} and a {role2} based on the following information: {context}
+Generate a detailed and realistic interaction between a {role1} and a {role2} based on the following information: {context}
 
 The interaction should include:
 1. A specific inquiry or problem from the {role1} related to the provided information
@@ -142,50 +147,20 @@ Format the interaction as:
 {role1}: [any follow-up question if applicable]
 {role2}: [follow-up response if applicable]'
 
-Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario. 
-IMPORTANT: Respond in the same language as the provided information. Do not use any knowledge outside of the given context."
+Ensure the example is as realistic and detailed as possible, mimicking a real-life scenario.
 
-topics:
-  - "Product information"
-  - "Order status"
-  - "Returns and refunds"
-  - "Technical support"
-  - "Account issues"
-  - "Shipping and delivery"
-  - "Billing inquiries"
-  - "Warranty claims"
-  - "Product comparisons"
-  - "Complaints"
-  - "API"
+FINAL REMINDER: Your entire response must be in the same language as the provided information. Do not use any knowledge outside of the given context."
+prompt_generate_topic: "Based on the following conversation, generate a short, concise topic (1-5 words) that best describes the main subject of the interaction. Respond ONLY with the topic, nothing else. Use the same language as the conversation.
+
+Conversation:
+{conversation}"
 ```
-
-## Text File Source Feature
-
-The text file source feature allows you to use a custom text file as the knowledge base for generating responses, instead of relying on the LLM's general knowledge. This is useful when you want to generate responses based on specific information or documentation.
-
-To use this feature:
-
-1. Set `use_text_file: true` in your `config-file.yaml`.
-2. Specify the path to your text file in `text_file_path` in the config file.
-3. Ensure your text file contains the relevant information you want to use for generating responses.
-
-When this feature is enabled, the script will:
-1. Load the content of the specified text file.
-2. Use gpt-4o-mini to generate responses based solely on the content of the text file, rather than its general knowledge.
-3. Structure the response according to your `prompt_text_file`, using only the information from your text file.
-
-Important notes when using a text file:
-- The `subject` and `topics` fields in the config file are not used when `use_text_file` is true.
-- Ensure your prompt instructs the model to use only the provided information and not any external knowledge.
-- The prompt should instruct the model to respond in the same language as the provided information to maintain consistency.
-
-To use the LLM model without a text file, set `use_text_file: false` in the config file. In this case, the script will use the `prompt_llm`, `subject`, and `topics` fields to generate diverse interactions.
 
 ## Output
 
 The script generates two output files:
 
-1. A CSV file (specified by `output_file` in the config) containing the raw generated text.
+1. A CSV file (specified by `output_file` in the config) containing the raw generated text and topics.
 2. A JSONL file (same name as the CSV but with `.jsonl` extension) containing a structured version of the interactions, parsed into a more usable format.
 
 ## Error Handling
@@ -194,22 +169,26 @@ The script includes error handling for:
 - API rate limit errors (waits and retries)
 - Authentication errors
 - Unexpected errors (waits and retries)
+- File not found errors
+- YAML parsing errors
 
 ## Advanced Features
 
-- **Custom Parsing**: Implement custom parsing logic in `parse_interaction()` function to extract specific fields from generated text.
+- **Text File Input**: The script can now use a text file as input for generating interactions.
+- **Text Chunking**: For large input files, the script can split the text into manageable chunks.
+- **Topic Generation**: The script now generates a topic for each interaction based on the content.
+- **Custom Parsing**: Implement custom parsing logic in `parse_conversation()` function to extract specific fields from generated text.
 - **Batch Processing**: The script supports generating large datasets in batches to manage API usage and processing time.
 - **Extensibility**: The modular design allows for easy addition of new features or integration with other data processing pipelines.
-- **Text File Source**: Use a custom text file as the knowledge base for generating responses, allowing for more focused and domain-specific datasets.
 
 ## Troubleshooting
 
-- **API Key Issues**: Ensure your OpenAI API key is correctly set in the `.env` file.
+- **API Key Issues**: Ensure your OpenAI API key is correctly set in the `.env` file or as an environment variable.
 - **Rate Limiting**: If you encounter frequent rate limit errors, try increasing the `delay` value in your config file.
 - **Model Availability**: Make sure the specified model in your config file is available in your OpenAI plan.
 - **Script Execution**: If you're having trouble running the script, ensure you're in the correct directory and using the correct path to the Python interpreter in your virtual environment: `./venv/bin/python main-script.py config-file.yaml`
 - **Virtual Environment**: If you see an error about missing modules, make sure you've activated the virtual environment with `source venv/bin/activate` before running the script.
-- **Text File Issues**: If using the text file feature, ensure the file exists at the specified path and contains the expected content.
+- **Input File Issues**: If using a text file as input, ensure the file exists and the path is correct in the config file.
 
 ## Contributing
 
