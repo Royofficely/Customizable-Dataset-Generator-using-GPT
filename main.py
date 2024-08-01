@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 import random
 import pandas as pd
-import time
 import asyncio
-from tqdm import tqdm
 import yaml
 import os
 import sys
@@ -11,44 +9,51 @@ import argparse
 from openai import AsyncOpenAI
 from convert_to_jsonl import convert_to_jsonl
 import tiktoken
-import hashlib
 
-def load_config(config_file):
+def load_config(config_file, prompts_file):
     try:
         with open(config_file, 'r') as file:
-            return yaml.safe_load(file)
-    except FileNotFoundError:
-        print(f"Error: {config_file} not found. Please ensure it exists in the project root.")
+            config = yaml.safe_load(file)
+        with open(prompts_file, 'r') as file:
+            prompts = yaml.safe_load(file)
+        config.update(prompts)  # Merge the two dictionaries
+        return config
+    except FileNotFoundError as e:
+        print(f"Error: {e.filename} not found. Please ensure it exists in the project root.")
         sys.exit(1)
     except yaml.YAMLError as e:
-        print(f"Error parsing {config_file}: {e}")
+        print(f"Error parsing YAML file: {e}")
         sys.exit(1)
 
 async def generate_text_from_llm(prompt, model, client):
-    try:
-        response = await client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=500,
-            n=1,
-            stop=None,
-            temperature=0.7,
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        if "Rate limit" in str(e):
-            print("Rate limit exceeded. Waiting for 60 seconds before retrying...")
-            await asyncio.sleep(60)
-            return await generate_text_from_llm(prompt, model, client)
-        elif "Authentication" in str(e):
-            print("Authentication error. Please check your API key.")
-            sys.exit(1)
-        else:
-            print(f"An unexpected error occurred: {e}")
-            await asyncio.sleep(20)  # Wait for 20 seconds before retrying
-            return await generate_text_from_llm(prompt, model, client)
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            response = await client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=500,
+                n=1,
+                stop=None,
+                temperature=0.7,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            if "Rate limit" in str(e):
+                print(f"Rate limit exceeded. Waiting for 60 seconds before retry {attempt + 1}...")
+                await asyncio.sleep(60)
+            elif "Authentication" in str(e):
+                print("Authentication error. Please check your API key.")
+                sys.exit(1)
+            else:
+                print(f"An unexpected error occurred: {e}")
+                await asyncio.sleep(20)
+            
+            if attempt == max_retries - 1:
+                print(f"Failed to generate text after {max_retries} attempts.")
+                return None
 
 def load_text_file(file_path):
     try:
@@ -60,8 +65,7 @@ def load_text_file(file_path):
 
 def num_tokens_from_string(string: str, encoding_name: str) -> int:
     encoding = tiktoken.get_encoding(encoding_name)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
+    return len(encoding.encode(string))
 
 def split_text_into_chunks(text, max_tokens=4000, overlap=200):
     encoding = tiktoken.get_encoding("cl100k_base")
@@ -82,52 +86,20 @@ async def summarize_text(text, client, model):
 
 async def generate_text_from_file(prompt, text_content, client, model, role1, role2, language, use_chunking=True):
     if not use_chunking:
-        try:
-            response = await client.chat.completions.create(
-                model=model,
-                messages=[
-                    {"role": "system", "content": f"You are a helpful assistant. Use the provided information to answer questions. Respond ONLY in {language}."},
-                    {"role": "user", "content": prompt.format(role1=role1, role2=role2, context=text_content, language=language)}
-                ],
-                max_tokens=500,
-                n=1,
-                stop=None,
-                temperature=0.7,
-            )
-            return response.choices[0].message.content.strip()
-        except Exception as e:
-            print(f"An error occurred while generating text from file: {e}")
-            await asyncio.sleep(20)
-            return await generate_text_from_file(prompt, text_content, client, model, role1, role2, language, use_chunking)
+        return await generate_text_from_llm(prompt.format(role1=role1, role2=role2, context=text_content, language=language), model, client)
 
     chunks = split_text_into_chunks(text_content)
     summaries = await asyncio.gather(*[summarize_text(chunk, client, model) for chunk in chunks])
     combined_summary = " ".join(summaries)
 
-    try:
-        response = await client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": f"You are a helpful assistant. Use the provided information to answer questions. Respond ONLY in {language}."},
-                {"role": "user", "content": prompt.format(role1=role1, role2=role2, context=combined_summary, language=language)}
-            ],
-            max_tokens=500,
-            n=1,
-            stop=None,
-            temperature=0.7,
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        print(f"An error occurred while generating text from file: {e}")
-        await asyncio.sleep(20)
-        return await generate_text_from_file(prompt, text_content, client, model, role1, role2, language, use_chunking)
+    return await generate_text_from_llm(prompt.format(role1=role1, role2=role2, context=combined_summary, language=language), model, client)
 
 async def generate_topic(conversation, model, client, language):
     topic_prompt = f"Based on the following conversation, generate a short, concise topic (1-5 words) that best describes the main subject of the interaction. Respond ONLY with the topic, nothing else. The topic must be in {language}:\n\n{conversation}"
     return await generate_text_from_llm(topic_prompt, model, client)
 
-async def main(config_file):
-    config = load_config(config_file)
+async def main(config_file, prompts_file):
+    config = load_config(config_file, prompts_file)
     api_key = os.getenv('OPENAI_API_KEY')
     if not api_key:
         print("Error: API key not found. Please set the OPENAI_API_KEY environment variable.")
@@ -140,17 +112,13 @@ async def main(config_file):
         text_content = load_text_file(config['text_file_path'])
         print(f"Text file loaded. Size: {len(text_content)} characters")
     
-    data = []
     async def process_interaction(i):
         if config['use_text_file']:
             prompt = config['prompt_text_file']
             print(f"Generating text for interaction {i+1}...")
             generated_text = await generate_text_from_file(prompt, text_content, client, config['model'], config['role1'], config['role2'], config['language'], config['use_chunking'])
         else:
-            if 'topics' in config and config['topics']:
-                topic = random.choice(config['topics'])
-            else:
-                topic = "general inquiry"  # Default topic if not provided
+            topic = random.choice(config['topics']) if 'topics' in config and config['topics'] else "general inquiry"
             prompt = config['prompt_llm'].format(
                 subject=config['subject'],
                 topic=topic,
@@ -160,21 +128,21 @@ async def main(config_file):
             )
             generated_text = await generate_text_from_llm(prompt, config['model'], client)
         
-        # Generate topic for the conversation
         topic = await generate_topic(generated_text, config['model'], client, config['language'])
-        
         return generated_text, topic
 
     tasks = [process_interaction(i) for i in range(config['num_interactions'])]
     results = await asyncio.gather(*tasks)
 
-    for generated_text, topic in results:
-        data.append({
+    data = [
+        {
             "topic": topic,
             "generated_text": generated_text,
             "role1": config['role1'],
             "role2": config['role2']
-        })
+        }
+        for generated_text, topic in results if generated_text and topic
+    ]
 
     df = pd.DataFrame(data)
     try:
@@ -189,6 +157,7 @@ async def main(config_file):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate a dataset using GPT")
-    parser.add_argument("config", help="Path to the configuration file")
+    parser.add_argument("config", help="Path to the general configuration file")
+    parser.add_argument("prompts", help="Path to the prompts configuration file")
     args = parser.parse_args()
-    asyncio.run(main(args.config))
+    asyncio.run(main(args.config, args.prompts))
