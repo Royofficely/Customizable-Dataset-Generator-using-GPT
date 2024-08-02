@@ -8,23 +8,23 @@ import sys
 def parse_conversation(text, role1, role2):
     pattern = f'({role1}|{role2}): (.+?)(?=\n(?:{role1}|{role2}):|\Z)'
     matches = re.findall(pattern, text, re.DOTALL)
-    return [{"role": role.lower(), "message": message.strip()} for role, message in matches]
+    return [{"role": "user" if role == role1 else "assistant", "content": message.strip()} for role, message in matches]
 
 def convert_to_jsonl(input_file, output_file, role1, role2):
     try:
         with open(input_file, 'r', newline='', encoding='utf-8') as infile, \
              codecs.open(output_file, 'w', encoding='utf-8') as outfile:
             reader = csv.DictReader(infile)
-            for id_counter, row in enumerate(reader, 1):
+            for row in reader:
                 topic = row['topic']
                 generated_text = row['generated_text']
                 conversation = parse_conversation(generated_text, role1, role2)
+                
+                # Add a system message at the beginning of each conversation
+                conversation.insert(0, {"role": "system", "content": f"This is a conversation about {topic}. {role1} is the customer and {role2} is the support agent."})
+                
                 json_obj = {
-                    "id": str(id_counter),
-                    "topic": topic,
-                    "conversation": conversation,
-                    "role1": role1,
-                    "role2": role2
+                    "messages": conversation
                 }
                 json_str = json.dumps(json_obj, ensure_ascii=False)
                 outfile.write(json_str + '\n')
