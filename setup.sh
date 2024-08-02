@@ -69,10 +69,17 @@ echo "OPENAI_API_KEY=$api_key" > .env
 # Export the sanitized API key for the current session
 export OPENAI_API_KEY="$api_key"
 
+# Set execute permissions for run.sh
+run_script_path="$(pwd)/run.sh"
+if [ ! -x "$run_script_path" ]; then
+    echo "Setting execute permissions for run.sh..."
+    chmod +x "$run_script_path"
+fi
+
 # Function to create alias and source config
 create_alias_and_source() {
     local shell_config="$1"
-    local alias_line="alias run='$PWD/run.sh'"
+    local alias_line="alias run='$(pwd)/run.sh'"
     
     if grep -Fxq "$alias_line" "$shell_config"; then
         echo "Alias already exists in $shell_config"
@@ -122,7 +129,7 @@ elif [[ "$SHELL" == */bash ]]; then
 else
     echo "Could not determine shell type. Please manually add the following lines to your shell configuration file:"
     echo "export OPENAI_API_KEY=\"$api_key\""
-    echo "alias run='$PWD/run.sh'"
+    echo "alias run='$(pwd)/run.sh'"
 fi
 
 print_green "Setup complete. The sanitized API key has been exported for the current session."
