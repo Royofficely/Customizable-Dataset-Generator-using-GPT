@@ -9,6 +9,7 @@ This project provides a flexible framework for generating synthetic datasets usi
 - [Usage](#-usage)
 - [Configuration](#-configuration)
 - [Output](#-output)
+- [Fine-tuning Compatibility](#-fine-tuning-compatibility)
 - [Error Handling](#-error-handling)
 - [Advanced Features](#-advanced-features)
 - [Troubleshooting](#-troubleshooting)
@@ -24,11 +25,13 @@ This project provides a flexible framework for generating synthetic datasets usi
 
 ## 🚀 Quick Start
 
-1. Clone this repository:
+1. Clone this repository and navigate into the project directory:
    ```bash
    git clone https://github.com/Royofficely/Customizable-Dataset-Generator-using-GPT.git
    cd Customizable-Dataset-Generator-using-GPT
    ```
+   
+   > ⚠️ Note: The `cd` command is crucial. It ensures you're in the correct directory to run the setup script and use the project files.
 
 2. Run the setup script:
    ```bash
@@ -47,6 +50,8 @@ This project provides a flexible framework for generating synthetic datasets usi
    ```bash
    run
    ```
+
+> 💡 Tip: If the `run` command doesn't work immediately, you may need to restart your terminal or source your shell configuration file (`source ~/.bashrc` or `source ~/.zshrc`) for the alias to take effect.
 
 ## 🖥 Usage
 
@@ -87,6 +92,30 @@ The script generates two output files:
 
 1. 📄 A CSV file (specified by `output_file` in the config) containing the raw generated text and topics.
 2. 📊 A JSONL file (same name as the CSV but with `.jsonl` extension) containing a structured version of the interactions, parsed into a more usable format.
+
+## 🧠 Fine-tuning Compatibility
+
+The JSONL output of this generator is designed to be compatible with common LLM fine-tuning processes. Each entry in the JSONL file follows this structure:
+
+```json
+{
+  "messages": [
+    {"role": "system", "content": "This is a conversation about [topic]. [role1] is the customer and [role2] is the support agent."},
+    {"role": "user", "content": "User message"},
+    {"role": "assistant", "content": "Assistant response"},
+    ...
+  ]
+}
+```
+
+This format is suitable for fine-tuning models like those offered by OpenAI. However, always check the specific requirements of your chosen LLM platform, as formats may vary.
+
+To use this data for fine-tuning:
+
+1. Ensure your JSONL file is generated using the latest version of the `convert_to_jsonl.py` script.
+2. Follow the fine-tuning instructions provided by your LLM platform, using this JSONL file as your training data.
+
+> Note: Fine-tuning requirements and processes can change. Always refer to the most up-to-date documentation of your LLM provider.
 
 ## 🛡 Error Handling
 
