@@ -1,3 +1,4 @@
+#!/bin/bash
 import re
 import csv
 import codecs
