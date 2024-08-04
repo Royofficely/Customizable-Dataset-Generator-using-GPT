@@ -146,3 +146,17 @@ fi
 
 print_green "\nYou can now run the main script from any directory by simply typing:"
 echo "run"
+
+# Activate the virtual environment
+print_green "\nActivating the virtual environment..."
+source venv/bin/activate
+
+# Add a note about the activated environment
+print_green "Virtual environment is now activated. Your prompt should reflect this change."
+print_green "To deactivate the environment, type 'deactivate' in your terminal."
+
+# Instruct the user to source the script
+print_green "\nTo apply changes to your current session, please run:"
+echo "source $0"
+
+exec $SHELL
