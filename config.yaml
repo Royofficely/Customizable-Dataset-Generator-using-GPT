@@ -8,7 +8,7 @@ delay: 1
 output_file: "synthetic_dataset.csv"
 role1: "Customer"
 role2: "Agent"
-language: "hebrew"
+language: "english"
 topics:
  - "product returns"
  - "billing issues"
