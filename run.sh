@@ -36,9 +36,11 @@ for file in "${required_files[@]}"; do
     fi
 done
 
-# Activate the virtual environment
-print_color "$GREEN" "Activating virtual environment..."
-source venv/bin/activate
+# Activate the virtual environment if not already activated
+if [[ "$VIRTUAL_ENV" != *"/venv" ]]; then
+    print_color "$GREEN" "Activating virtual environment..."
+    source venv/bin/activate
+fi
 
 # Run the main Python script
 print_color "$GREEN" "Running main.py..."
@@ -46,12 +48,8 @@ if python main.py config.yaml prompts.yaml; then
     print_color "$GREEN" "Script executed successfully."
 else
     print_color "$RED" "Error: Script execution failed."
-    deactivate
     exit 1
 fi
 
-# Deactivate the virtual environment
-print_color "$GREEN" "Deactivating virtual environment..."
-deactivate
-
 print_color "$GREEN" "Done."
+# Note: We're not deactivating the virtual environment here to keep the user in the correct environment
