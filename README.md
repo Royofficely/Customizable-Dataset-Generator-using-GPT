@@ -1,164 +1,301 @@
 # 🤖 Customizable Dataset Generator using GPT
 
-This project provides a flexible framework for generating synthetic datasets using OpenAI's GPT model. It can be easily adapted to generate various types of text data based on user-defined topics and prompts, with a focus on creating realistic interactions between two roles (e.g., customer and support agent).
+A flexible framework for generating synthetic datasets using OpenAI's GPT model. Easily adaptable for various types of text data with a focus on creating realistic interactions between two roles (e.g., customer and support agent).
+
+## ✨ Features
+
+- 🤖 **GPT-Powered Generation** – Leverages OpenAI's advanced language models
+- 🎯 **Customizable Prompts** – Flexible prompt templates for different use cases
+- 📚 **Text File Input Support** – Generate datasets from existing text files
+- 🧩 **Smart Chunking** – Handles large input files efficiently
+- 🌍 **Multi-Language Support** – Generate content in different languages
+- 📊 **Multiple Output Formats** – CSV and JSONL for various applications
+- 🧠 **Fine-Tuning Ready** – Output compatible with LLM fine-tuning processes
+- 🛡️ **Robust Error Handling** – Built-in rate limiting and retry mechanisms
 
 ## 📋 Table of Contents
 
-- [Prerequisites](#-prerequisites)
-- [Quick Start](#-quick-start)
-- [Usage](#-usage)
-- [Configuration](#-configuration)
-- [Output](#-output)
-- [Fine-tuning Compatibility](#-fine-tuning-compatibility)
-- [Error Handling](#-error-handling)
-- [Advanced Features](#-advanced-features)
-- [Troubleshooting](#-troubleshooting)
-- [Contributing](#-contributing)
-- [License](#-license)
-- [Disclaimer](#-disclaimer)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Output Formats](#output-formats)
+- [Fine-Tuning Compatibility](#fine-tuning-compatibility)
+- [Advanced Features](#advanced-features)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
 
-## 🛠 Prerequisites
+## 🛠️ Prerequisites
 
-- Python 3.6+
-- OpenAI API key
-- Git (for cloning the repository)
+- **Python 3.6+**
+- **OpenAI API key** ([Get one here](https://platform.openai.com/api-keys))
+- **Git** (for cloning the repository)
 
 ## 🚀 Quick Start
 
-1. Clone this repository and navigate into the project directory:
-   ```bash
-   git clone https://github.com/Royofficely/Customizable-Dataset-Generator-using-GPT.git
-   cd Customizable-Dataset-Generator-using-GPT
-   ```
-   
-   > ⚠️ Note: The `cd` command is crucial. It ensures you're in the correct directory to run the setup script and use the project files.
+### 1. Clone and Setup
 
-2. Run the setup script:
-   ```bash
-   chmod +x setup.sh
-   ./setup.sh
-   ```
-   
-   This script will:
-   - ✅ Check for Python 3.6+
-   - 🌿 Create a virtual environment
-   - 📦 Install dependencies
-   - 🔑 Prompt you for your OpenAI API key and save it securely
-   - 🔗 Create an alias for easy execution
+```bash
+git clone https://github.com/Royofficely/Customizable-Dataset-Generator-using-GPT.git
+cd Customizable-Dataset-Generator-using-GPT
+```
 
-3. After setup, you can run the main script from any directory by simply typing:
-   ```bash
-   run
-   ```
+> ⚠️ **Important**: The `cd` command is crucial for proper setup and execution.
 
-> 💡 Tip: If the `run` command doesn't work immediately, you may need to restart your terminal or source your shell configuration file (`source ~/.bashrc` or `source ~/.zshrc`) for the alias to take effect.
+### 2. Run Setup Script
 
-## 🖥 Usage
+```bash
+chmod +x setup.sh
+./setup.sh
+```
 
-After the initial setup, you can generate datasets using the following steps:
+The setup script will:
+- ✅ Verify Python 3.6+ installation
+- 🌿 Create and configure virtual environment
+- 📦 Install required dependencies
+- 🔑 Securely store your OpenAI API key
+- 🔗 Create convenient run alias
 
-1. Ensure you're in the project directory or any directory if you've set up the alias.
-2. Run the script:
-   ```bash
-   run
-   ```
-   or if the alias isn't working:
-   ```bash
-   ./run.sh
-   ```
-3. The script will use the configurations from `config.yaml` and `prompts.yaml` to generate your dataset.
+### 3. Start Generating
 
-## ⚙ Configuration
+After setup, run from any directory:
 
-Edit the `config.yaml` and `prompts.yaml` files to customize:
+```bash
+run
+```
 
-- `use_text_file`: Set to true if you want to use a text file as input
-- `text_file_path`: Path to the input text file (if `use_text_file` is true)
-- `use_chunking`: Enable text chunking for large input files
-- `language`: Set the language of the generated content
-- `subject`: The type of text being generated (e.g., "customer support interactions")
-- `model`: The GPT model to use (e.g., "gpt-3.5-turbo")
-- `num_interactions`: Number of data points to generate
-- `delay`: Delay between API calls (in seconds)
-- `output_file`: Name of the output CSV file
-- `role1` and `role2`: The two roles in the interaction (e.g., "Customer" and "Agent")
-- `prompt_llm`: The prompt template for generating text when not using a text file
-- `prompt_text_file`: The prompt template for generating text when using a text file
-- `topics`: List of topics or categories for generation (optional)
+> 💡 **Tip**: If the `run` command doesn't work immediately, restart your terminal or run `source ~/.bashrc` (or `~/.zshrc`).
 
-## 📤 Output
+## 🖥️ Usage
 
-The script generates two output files:
+### Basic Usage
 
-1. 📄 A CSV file (specified by `output_file` in the config) containing the raw generated text and topics.
-2. 📊 A JSONL file (same name as the CSV but with `.jsonl` extension) containing a structured version of the interactions, parsed into a more usable format.
+```bash
+# Using the alias (recommended)
+run
 
-## 🧠 Fine-tuning Compatibility
+# Or directly
+./run.sh
+```
 
-The JSONL output of this generator is designed to be compatible with common LLM fine-tuning processes. Each entry in the JSONL file follows this structure:
+### Configuration-Based Generation
+
+The generator uses `config.yaml` and `prompts.yaml` files for customization. Simply edit these files and run the script to generate your custom dataset.
+
+## ⚙️ Configuration
+
+### Main Configuration (`config.yaml`)
+
+```yaml
+# Input Settings
+use_text_file: false           # Use existing text file as input
+text_file_path: "input.txt"    # Path to input file
+use_chunking: true             # Enable text chunking for large files
+
+# Generation Settings
+language: "English"            # Output language
+subject: "customer support"    # Type of interactions
+model: "gpt-3.5-turbo"        # GPT model to use
+num_interactions: 100          # Number of data points to generate
+delay: 1                       # Delay between API calls (seconds)
+
+# Output Settings
+output_file: "generated_data.csv"  # Output filename
+role1: "Customer"              # First role in interactions
+role2: "Agent"                 # Second role in interactions
+
+# Topics (optional)
+topics:
+  - "billing issues"
+  - "technical support"
+  - "product questions"
+```
+
+### Prompt Templates (`prompts.yaml`)
+
+```yaml
+# Prompt for text file input
+prompt_text_file: |
+  Generate a realistic conversation between a {role1} and {role2} based on this content: {chunk}
+  
+# Prompt for topic-based generation
+prompt_llm: |
+  Create a {language} conversation between a {role1} and {role2} about {subject}.
+  Make it realistic and helpful.
+```
+
+## 📤 Output Formats
+
+The generator creates two complementary output files:
+
+### 1. CSV Format (`generated_data.csv`)
+
+```csv
+topic,generated_text,role1,role2
+billing issues,"Customer: I have a question about my bill...",Customer,Agent
+```
+
+### 2. JSONL Format (`generated_data.jsonl`)
+
+```json
+{"messages": [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]}
+```
+
+## 🧠 Fine-Tuning Compatibility
+
+The JSONL output is designed for LLM fine-tuning with the standard conversation format:
 
 ```json
 {
   "messages": [
-    {"role": "system", "content": "This is a conversation about [topic]. [role1] is the customer and [role2] is the support agent."},
-    {"role": "user", "content": "User message"},
-    {"role": "assistant", "content": "Assistant response"},
-    ...
+    {
+      "role": "system", 
+      "content": "This is a conversation about [topic]. Customer is seeking help from Agent."
+    },
+    {
+      "role": "user", 
+      "content": "Customer message here"
+    },
+    {
+      "role": "assistant", 
+      "content": "Agent response here"
+    }
   ]
 }
 ```
 
-This format is suitable for fine-tuning models like those offered by OpenAI. However, always check the specific requirements of your chosen LLM platform, as formats may vary.
+### Using for Fine-Tuning
 
-To use this data for fine-tuning:
+1. Generate your dataset using this tool
+2. Use the `.jsonl` file as training data
+3. Follow your LLM platform's fine-tuning documentation
 
-1. Ensure your JSONL file is generated using the latest version of the `convert_to_jsonl.py` script.
-2. Follow the fine-tuning instructions provided by your LLM platform, using this JSONL file as your training data.
-
-> Note: Fine-tuning requirements and processes can change. Always refer to the most up-to-date documentation of your LLM provider.
-
-## 🛡 Error Handling
-
-The script includes robust error handling for:
-- 🕒 API rate limit errors (waits and retries)
-- 🔒 Authentication errors
-- 🚫 Unexpected errors (waits and retries)
-- 🔍 File not found errors
-- 📝 YAML parsing errors
+> 📚 **Note**: Always check your specific platform's requirements as formats may vary.
 
 ## 🔬 Advanced Features
 
-- 📚 **Text File Input**: Use a text file as input for generating interactions.
-- 🧩 **Text Chunking**: Split large input files into manageable chunks.
-- 🏷 **Topic Generation**: Automatically generate a topic for each interaction based on the content.
-- 🔧 **Custom Parsing**: Implement custom parsing logic to extract specific fields from generated text.
-- 📦 **Batch Processing**: Generate large datasets in batches to manage API usage and processing time.
-- 🔌 **Extensibility**: Modular design allows for easy addition of new features or integration with other data processing pipelines.
+### Text File Processing
+
+```yaml
+use_text_file: true
+text_file_path: "knowledge_base.txt"
+use_chunking: true
+```
+
+Process existing documentation or knowledge bases to generate relevant conversations.
+
+### Batch Processing
+
+Generate large datasets efficiently with built-in rate limiting and retry mechanisms.
+
+### Custom Parsing
+
+Implement custom parsing logic in the `convert_to_jsonl.py` script for specific field extraction.
+
+### Multi-Language Support
+
+```yaml
+language: "Spanish"  # or French, German, etc.
+```
+
+Generate datasets in multiple languages for international applications.
+
+## 🛡️ Error Handling
+
+The system includes comprehensive error handling:
+
+- **🕒 Rate Limiting** – Automatic backoff and retry
+- **🔒 Authentication** – Clear API key validation
+- **🚫 API Errors** – Graceful error recovery
+- **📁 File Operations** – Robust file handling
+- **📝 Configuration** – YAML parsing validation
 
 ## 🔍 Troubleshooting
 
-- 🔑 **API Key Issues**: Ensure your OpenAI API key is correctly set in the `.env` file or as an environment variable.
-- ⏱ **Rate Limiting**: If you encounter frequent rate limit errors, try increasing the `delay` value in your config file.
-- 🤖 **Model Availability**: Make sure the specified model in your config file is available in your OpenAI plan.
-- 🖥 **Script Execution**: If you're having trouble running the script, ensure you're in the correct directory and the `run` alias is set up correctly.
-- 🌿 **Virtual Environment**: If you see an error about missing modules, make sure you've activated the virtual environment or use the `run` command.
-- 📄 **Input File Issues**: If using a text file as input, ensure the file exists and the path is correct in the config file.
-- 🐚 **Shell Configuration**: If the `run` command doesn't work, try sourcing your shell configuration file (`source ~/.bashrc` or `source ~/.zshrc`) or restart your terminal.
+### Common Issues
+
+**API Key Problems**
+```bash
+# Check if API key is set
+echo $OPENAI_API_KEY
+
+# Re-run setup if needed
+./setup.sh
+```
+
+**Rate Limiting**
+```yaml
+# Increase delay in config.yaml
+delay: 2  # or higher
+```
+
+**Model Availability**
+```yaml
+# Use available model
+model: "gpt-3.5-turbo"  # instead of gpt-4 if not available
+```
+
+**Script Execution Issues**
+```bash
+# Make sure you're in the project directory
+pwd
+
+# Activate virtual environment manually if needed
+source venv/bin/activate
+python main.py
+```
+
+### Getting Help
+
+1. Check the [Issues](https://github.com/Royofficely/Customizable-Dataset-Generator-using-GPT/issues) page
+2. Review the troubleshooting section above
+3. Ensure all prerequisites are met
+4. Verify your OpenAI API key has sufficient credits
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+Contributions are welcome! Here's how to get started:
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Development Setup
 
-## 📜 License
+```bash
+# Fork and clone your fork
+git clone https://github.com/YOUR_USERNAME/Customizable-Dataset-Generator-using-GPT.git
+cd Customizable-Dataset-Generator-using-GPT
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+# Create feature branch
+git checkout -b feature/amazing-feature
 
-## ⚠️ Disclaimer
+# Make your changes and commit
+git commit -m 'Add amazing feature'
 
-This project is for educational and research purposes only. Ensure you comply with OpenAI's use-case policy and terms of service when using their API. The generated data should not be used for any malicious purposes or to create misleading information.
+# Push and create PR
+git push origin feature/amazing-feature
+```
+
+### Contribution Guidelines
+
+- Write clear, descriptive commit messages
+- Add tests for new features
+- Update documentation as needed
+- Follow existing code style
+- Open an issue for major changes first
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## ⚠️ Important Disclaimers
+
+- **Educational Use**: This project is for educational and research purposes
+- **API Compliance**: Ensure compliance with OpenAI's use-case policy and terms of service
+- **Responsible Use**: Generated data should not be used for malicious purposes or creating misleading information
+- **API Costs**: Be aware that generating large datasets will consume OpenAI API credits
+- **Data Quality**: Always review and validate generated content before use in production
+
+---
+
+**Made with ❤️ by Roy Nativ**
+
+**⭐ Star this repo if you find it helpful!**
